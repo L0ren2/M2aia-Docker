@@ -1,7 +1,7 @@
-BASE-DIR=/home/maia/Documents/maia/00_my_m2aia/Docker/M2aiaContainer# without trailing / ; do not remove the # character after the path (dont introduce whitespace in the path)
-PYTHON-DIR=/home/maia/Documents/maia/00_my_m2aia/Docker/M2aiaContainerPython#
-R-DIR=/home/maia/Documents/maia/00_my_m2aia/Docker/M2aiaContainerR#
-THIS-DIR=/home/maia/Documents/maia/00_my_m2aia/Docker#
+THIS-DIR=/home/maia/Documents/maia/Docker# without trailing / ; do not remove the # character after the path (dont introduce whitespace in the path)
+BASE-DIR=$(THIS-DIR)/M2aiaContainer# 
+PYTHON-DIR=$(THIS-DIR)/M2aiaContainerPython#
+R-DIR=$(THIS-DIR)/M2aiaContainerR#
 
 base:
 	docker build $(BASE-DIR) -t m2aia-docker-base

@@ -1,5 +1,9 @@
-# M2aia-CLI
-This is used as the Command Line Interface for M2aia. 
+# M2aia-Docker
+This is used as a way to execute external Modules for M2aia. 
+
+As long as there is a suited Docker Container, the language the module is written in does not matter. 
+
+It is expected, that the modules will write their output into the m2aia-share directory. 
 
 ## Prerequisites
 - Working installation of `docker`
@@ -13,7 +17,7 @@ Then modify the variable `THIS-DIR` to point to the current directory (the direc
 
 That's it! 
 
-You can now use all programs inside that docker container (including the ones in `$(THIS-DIR)/bin`). 
+You can now use all programs inside that docker container. 
 
 ## Run the CLI
 There are two ways supported: 
