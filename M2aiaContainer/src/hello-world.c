@@ -2,11 +2,13 @@
 
 int main(int argc, char* argv[])
 {
-	printf("Hello, ");
+	FILE* out = fopen("/m2aia-share/hello-world-out.txt", "w+");
+	fprintf(out, "Hello, ");
 	if (argc > 1)
-		printf("%s!\n", argv[1]);
+		fprintf(out, "%s!\n", argv[1]);
 	else 
-		printf("World!\n");
+		fprintf(out, "World!\n");
+	fclose(out);
 	return 0;
 }
 
