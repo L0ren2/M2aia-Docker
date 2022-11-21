@@ -1,75 +1,71 @@
 import m2aia as m2
 import numpy as np
+import matplotlib as plt
+import seaborn as sns
+import SimpleITK as sitk
 
 import sys
 
-import time
-from contextlib import contextmanager
-import seaborn as sns
-import matplotlib.pyplot as plt
+file_names = ["/data1/" + sys.argv[1], "/output1/" + sys.argv[2]]
+
+mzVal = 150 # default
+tol   = 0.25
+for i in range(0, len(sys.argv) - 1):
+    if sys.argv[i] == "--mz" or sys.argv[i] == "-mz":
+        mzVal = float(sys.argv[i + 1])
+    if sys.argv[i] == "--tol":
+        tol = float(sys.argv[i + 1])
 
 sns.set_theme(style="darkgrid")
 sns.set(rc={'figure.figsize':(19,6)})
 
-imz = 190
+def showimg(image, cmap=None, title=None):
+    sns.set_theme(style="ticks")
+    fig = plt.figure(figsize = (10,10)) # create a 5 x 5 figure 
+    ax = fig.add_subplot(111)
+    ax.tick_params(
+        which='both',
+        bottom=False,
+        left=False,
+        labelleft=False,
+        labelbottom=False)
+    x = [10,60]
+    y = [10,10]
 
-file_names = ["/data1/" + sys.argv[1], "/output1/" + sys.argv[2]]
+    spacing = I.GetSpacing()
+    ax.plot(x, y, color="white", linewidth=3)
+    ax.text(x[0], y[0]+7, f"{int(spacing[0]*(x[1]-x[0])* 1000)} μm", color="white",size=14)
+    if title:
+        ax.text(x[0], y[0]-3, title, color="white", size=14)
+    ax.imshow(image, interpolation='none', cmap=cmap)
 
-start = time.time()
-I = m2.ImzMLReader(file_names[0])
-# I.SetNormalization(m2.m2NormalizationTIC)
+    return fig, ax 
+
+# Set the parameters
+I = m2.ImzMLReader(str(file_names[0]))
+#I.SetNormalization(m2.m2NormalizationTIC)
+I.SetSmoothing(m2.m2SmoothingGaussian,12)
+I.SetBaselineCorrection(m2.m2BaselineCorrectionTopHat)
 I.Execute()
-ys_1 = I.GetMeanSpectrum()
-i_1 = I.GetArray(imz, 75)
-print(time.time() - start,'s', "None")
-xs = I.GetXAxis()
 
-start = time.time()
-I = m2.ImzMLReader(file_names[0])
-# I.SetNormalization(m2.m2NormalizationTIC)
-I.SetIntensityTransformation(m2.m2IntensityTransformationSquareRoot)
-I.Execute()
-ys_2 = I.GetMeanSpectrum()
-i_2 = I.GetArray(imz, 75)
-print(time.time() - start,'s', 'SR Transform')
+# 1) GetArray(mz, tol) will generate a numpy array, loosing all real world information like the origin, spacing or direction of the image.
+# 2) GetImage(mz, tol) will generate a itkImage, that holds those real world information. 
+#
+# If ion images are produced for further analysis pipelines, it is recommended to use the GetImage method and save the images as .nrrd files [1], using SimpleITK [2].
+# E.g.: sitk.WriteImage(I.GetImage(mz,tol), path/to/file.nrrd)
+#
+# [1] http://teem.sourceforge.net/nrrd/format.html
+# [2] https://simpleitk.org/
 
-start = time.time()
-I = m2.ImzMLReader(file_names[0])
-# I.SetNormalization(m2.m2NormalizationTIC)
-I.SetIntensityTransformation(m2.m2IntensityTransformationSquareRoot)
-I.SetSmoothing(m2.m2SmoothingGaussian,10)
-I.Execute()
-i_3 = I.GetArray(imz, 75)
-ys_3 = I.GetMeanSpectrum()
-print(time.time() - start,'s', 'Smoothing (hws 4), SR Transform')
+I.SetPooling(m2.m2PoolingMean)
 
-start = time.time()
-I = m2.ImzMLReader(file_names[0])
-# I.SetNormalization(m2.m2NormalizationTIC)
-I.SetIntensityTransformation(m2.m2IntensityTransformationSquareRoot)
-I.SetSmoothing(m2.m2SmoothingGaussian,50)
-I.Execute()
-ys_4 = I.GetMeanSpectrum()
-i_3 = I.GetArray(imz, 75)
-print(time.time() - start,'s', 'Smoothing (hws 50), SR Transform')
+#MUSC = I.GetImage(1088.868, 0.25)
+#CONT = I.GetImage(177.919, 0.25)
+TUMOR = I.GetImage(mzVal, tol)
+FileWriter = sitk.ImageFileWriter()
+FileWriter.SetFileName(str(file_names[1]))
+FileWriter.Execute(TUMOR)
 
-x_lim = [150,270]
-plt.figure(figsize=(16,5), dpi=300)
-# plt.gca().set_aspect(3)
-
-plt.xlim(x_lim)
-plt.ylim([-0.1,2])
-plt.xlabel('m/z')
-plt.ylabel('intensity')
-plt.plot(xs, ys_1, '--',alpha=0.3)
-plt.plot(xs, ys_2, alpha=0.7)
-plt.plot(xs, ys_3, alpha=0.7)
-plt.plot(xs, ys_4, alpha=0.7)
-plt.plot(imz,0, 'r^')
-plt.legend(['None', 'SR Transform', 'Smoothing (hws 4), SR Transform', 'Smoothing (hws 50), SR Transform'])
-plt.savefig(file_names[1], dpi=300)
-
-print(f'Intensities', I.GetXAxisDepth())
-print(f'Intensities in m/z range {np.sum(xs >= x_lim[0]) - np.sum(xs > x_lim[1])}')
-
-
+#showimg(np.squeeze(MUSC), cmap='gray', title='musculature (m/z 1088.868±0.249 Da)')
+#showimg(np.squeeze(CONT), cmap='gray', title='gut content (m/z 177.919±0.2 Da)')
+#showimg(np.squeeze(NEMA), cmap='gray', title='nematode cysts (m/z 262.177±0.2 Da)')
