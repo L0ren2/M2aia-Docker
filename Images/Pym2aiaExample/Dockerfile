@@ -1,5 +1,5 @@
 FROM m2aia/docker:pym2aia
-LABEL m2aia/docker="pym2aia-example-2"
+LABEL m2aia/docker="pym2aia-example"
 COPY ./install.sh /install.sh
 RUN /install.sh
-COPY ./m2aia-module.py /
+COPY ./cli-module.py /
