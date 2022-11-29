@@ -2,6 +2,7 @@ THIS-DIR=/home/maia/Documents/maia/Docker/Images# without trailing / ; do not re
 BASE-DIR=$(THIS-DIR)/Base# 
 PYTHON-DIR=$(THIS-DIR)/Python#
 R-DIR=$(THIS-DIR)/R#
+R-EXAMPLE-DIR=$(THIS-DIR)/RExample#
 PYM2AIA-DIR=$(THIS-DIR)/Pym2aia#
 PYM2AIA-EXAMPLE-DIR=$(THIS-DIR)/Pym2aiaExample#
 
@@ -16,6 +17,10 @@ python: base
 r: base
 	docker build $(R-DIR) -t m2aia/docker:r
 	@echo "Successfully built R image!"
+
+r-example: r
+	docker build $(R-EXAMPLE-DIR) -t m2aia/docker:r-example
+	@echo "Successfully built R-Example image!"
 
 pym2aia: python
 	docker build $(PYM2AIA-DIR) -t m2aia/docker:pym2aia

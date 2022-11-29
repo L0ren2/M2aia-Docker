@@ -3,10 +3,7 @@ import numpy as np
 import matplotlib as plt
 import seaborn as sns
 import SimpleITK as sitk
-
 import sys
-
-file_names = ["/data1/" + sys.argv[1], "/output1/" + sys.argv[2]]
 
 mzVal = 150 # default
 tol   = 0.25
@@ -15,6 +12,8 @@ for i in range(0, len(sys.argv) - 1):
         mzVal = float(sys.argv[i + 1])
     if sys.argv[i] == "--tol":
         tol = float(sys.argv[i + 1])
+
+file_names = ["/data1/" + sys.argv[1], "/output1/" + str(mzVal) + "_+-_" + str(tol) + "_" + sys.argv[1] + ".nrrd"]
 
 sns.set_theme(style="darkgrid")
 sns.set(rc={'figure.figsize':(19,6)})
@@ -43,29 +42,13 @@ def showimg(image, cmap=None, title=None):
 
 # Set the parameters
 I = m2.ImzMLReader(str(file_names[0]))
-#I.SetNormalization(m2.m2NormalizationTIC)
 I.SetSmoothing(m2.m2SmoothingGaussian,12)
 I.SetBaselineCorrection(m2.m2BaselineCorrectionTopHat)
 I.Execute()
 
-# 1) GetArray(mz, tol) will generate a numpy array, loosing all real world information like the origin, spacing or direction of the image.
-# 2) GetImage(mz, tol) will generate a itkImage, that holds those real world information. 
-#
-# If ion images are produced for further analysis pipelines, it is recommended to use the GetImage method and save the images as .nrrd files [1], using SimpleITK [2].
-# E.g.: sitk.WriteImage(I.GetImage(mz,tol), path/to/file.nrrd)
-#
-# [1] http://teem.sourceforge.net/nrrd/format.html
-# [2] https://simpleitk.org/
-
 I.SetPooling(m2.m2PoolingMean)
 
-#MUSC = I.GetImage(1088.868, 0.25)
-#CONT = I.GetImage(177.919, 0.25)
 TUMOR = I.GetImage(mzVal, tol)
 FileWriter = sitk.ImageFileWriter()
 FileWriter.SetFileName(str(file_names[1]))
 FileWriter.Execute(TUMOR)
-
-#showimg(np.squeeze(MUSC), cmap='gray', title='musculature (m/z 1088.868±0.249 Da)')
-#showimg(np.squeeze(CONT), cmap='gray', title='gut content (m/z 177.919±0.2 Da)')
-#showimg(np.squeeze(NEMA), cmap='gray', title='nematode cysts (m/z 262.177±0.2 Da)')
