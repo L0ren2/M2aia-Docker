@@ -1,4 +1,9 @@
-library(Cardinal)
+if (!require("Cardinal"))
+       if (!requireNamespace("BiocManager", quietly = TRUE))
+              install.packages("BiocManager")
+       BiocManager::install("Cardinal")
+
+library("Cardinal")
 
 fcThreshold <- 1
 pThreshold  <- 0.05

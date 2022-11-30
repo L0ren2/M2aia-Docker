@@ -30,5 +30,5 @@ pym2aia-example: pym2aia
 	docker build $(PYM2AIA-EXAMPLE-DIR) -t m2aia/docker:pym2aia-example
 	@echo "Successfully built Pym2aiaExample image!"
 
-all: pym2aia-example r # will build the rest of all images implicitly
+all: pym2aia-example r-example # will build the rest of all images implicitly
 
