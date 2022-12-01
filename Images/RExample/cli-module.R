@@ -1,7 +1,57 @@
-if (!require("Cardinal"))
-       if (!requireNamespace("BiocManager", quietly = TRUE))
-              install.packages("BiocManager")
-       BiocManager::install("Cardinal")
+if (!require("Cardinal")) {
+	if (!requireNamespace("BiocManager", quietly = TRUE)) {
+		install.packages("BiocManager")
+	}
+	BiocManager::install("Cardinal")
+	if (!require("readr"))
+		install.packages("readr")
+}
+library(readr)
+
+outFile <- "/output1/out.png"
+
+args <- commandArgs(trailingOnly=TRUE)
+inFile <- "/data1/" + args[1]
+
+imzML <- read_file(inFile)
+
+# um unteren code auszuführen, fehlen folgende variablen:
+# df_fil
+df_fil <- 0
+# ROI
+ROI <- 0
+# label
+label <- 0
+# labelROI
+labelROI <- 0
+# treat
+treat <- 0
+# intmat_fil
+intmat_fil <- 0
+# mz
+mz <- 0
+# int
+int <- 0
+# cell 
+cell  <- 0
+# CCD
+CCD <- 0
+# HT
+HT <- 0
+# fcThreshold
+fcThreshold <- 0
+# pThreshold
+pThreshold <- 0
+# sig
+sig <- 0
+# dfPlot
+dfPlot <- 0
+# log2FC
+log2FC <- 0
+# padj
+padj <- 0
+# sig
+sig <- 0
 
 library("Cardinal")
 
@@ -35,7 +85,6 @@ dfPlot <- intmat_fil %>%
   mutate(padj = p.adjust(pval, method = "BH", n = dim(intmat_fil)[2]),
          sig = padj < pThreshold & abs(log2FC) > fcThreshold,
          label = ifelse(sig, round(as.numeric(mz), 2), NA)) 
-
 
 ggplot(dfPlot, aes(x = log2FC,
            y = -log10(padj),
