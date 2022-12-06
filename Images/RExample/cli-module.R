@@ -2,7 +2,10 @@ if (!require("Cardinal")) {
 	if (!requireNamespace("BiocManager", quietly = TRUE)) {
 		install.packages("BiocManager")
 	}
-	BiocManager::install("Cardinal")
+	if (!requireNamespace("dbplyr", quietly = TRUE)) {
+		install.packages("dbplyr")
+	}
+       BiocManager::install("Cardinal")
 	if (!require("readr"))
 		install.packages("readr")
 }
@@ -11,7 +14,7 @@ library(readr)
 outFile <- "/output1/out.png"
 
 args <- commandArgs(trailingOnly=TRUE)
-inFile <- "/data1/" + args[1]
+inFile <- paste("/data1/", args[1], sep="")
 
 imzML <- read_file(inFile)
 

@@ -9,4 +9,7 @@ libtiff5-dev \
 libcurl4-openssl-dev \
 curl
 
+COPY ./install.R /install.R
+RUN Rscript /install.R
+
 COPY ./cli-module.R /cli-module.R
