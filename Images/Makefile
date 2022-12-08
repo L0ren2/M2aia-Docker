@@ -5,6 +5,7 @@ R-DIR=$(THIS-DIR)/R#
 R-EXAMPLE-DIR=$(THIS-DIR)/RExample#
 PYM2AIA-DIR=$(THIS-DIR)/Pym2aia#
 PYM2AIA-EXAMPLE-DIR=$(THIS-DIR)/Pym2aiaExample#
+PYM2AIA-VOLCANO-DIR=$(THIS-DIR)/Pym2aiaVolcanoPlot#
 
 base:
 	docker build $(BASE-DIR) -t m2aia/docker:base
@@ -30,5 +31,9 @@ pym2aia-example: pym2aia
 	docker build $(PYM2AIA-EXAMPLE-DIR) -t m2aia/docker:pym2aia-example
 	@echo "Successfully built Pym2aiaExample image!"
 
-all: pym2aia-example r-example # will build the rest of all images implicitly
+pym2aia-volcano: pym2aia
+	docker build $(PYM2AIA-VOLCANO-DIR) -t m2aia/docker:pym2aia-volcano-plot
+	@echo "Successfully built Pym2aiaVolcano image!"
+
+all: base r python pym2aia pym2aia-volcano # dont build examples
 
