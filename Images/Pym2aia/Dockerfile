@@ -13,6 +13,8 @@ RUN apt-get install -q -y --no-install-recommends \
 	python3-scipy \
 	python3-mne
 RUN pip install wget \
+numpy==1.23.5 \
+python-dateutil==2.8.2 \
 matplotlib==3.5.0 \
 seaborn \
 seaborn_image \

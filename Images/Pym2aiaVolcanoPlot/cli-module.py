@@ -12,6 +12,7 @@ import pathlib
 import sys
 
 input_file = "/data1/" + str(sys.argv[1])
+print("using input file ", input_file)
 
 image = m2.ImzMLReader(input_file)
 image.Execute()
